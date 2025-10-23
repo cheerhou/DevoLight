@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+export DEVO_CLAUDE_BASE_URL="${DEVO_CLAUDE_BASE_URL:-https://dpapi.cn}"
+export DEVO_CLAUDE_MODEL="${DEVO_CLAUDE_MODEL:-claude-sonnet-4-20250514}"
+export DEVO_CLAUDE_MAX_TOKENS="${DEVO_CLAUDE_MAX_TOKENS:-1024}"
+export DEVO_CLAUDE_TEMPERATURE="${DEVO_CLAUDE_TEMPERATURE:-0.0}"
+export DEVO_CLAUDE_TIMEOUT="${DEVO_CLAUDE_TIMEOUT:-30.0}"
+
+if [[ -z "${DEVO_CLAUDE_API_KEY:-}" ]]; then
+  if [[ -n "${DEVO_CLAUDE_API_KEY_FILE:-}" && -f "${DEVO_CLAUDE_API_KEY_FILE}" ]]; then
+    export DEVO_CLAUDE_API_KEY="$(<"$DEVO_CLAUDE_API_KEY_FILE")"
+  else
+    read -s -p "请输入 DEVO_CLAUDE_API_KEY: " key
+    echo
+    if [[ -z "$key" ]]; then
+      echo "缺少 DEVO_CLAUDE_API_KEY，无法启动服务。" >&2
+      exit 1
+    fi
+    export DEVO_CLAUDE_API_KEY="$key"
+  fi
+fi
+
+PORT="${PORT:-8000}"
+
+echo "启动 DevoLight Router 服务: http://127.0.0.1:${PORT}"
+exec uvicorn src.devolight_router.main:app --host 127.0.0.1 --port "$PORT"

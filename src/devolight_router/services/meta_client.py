@@ -17,13 +17,24 @@ class MetaRouterResponseError(RuntimeError):
 LLMCallable = Callable[[str, Dict], str]
 
 
+LOGGER = logging.getLogger(__name__)
+if not LOGGER.handlers:
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    handler.setFormatter(formatter)
+    LOGGER.addHandler(handler)
+LOGGER.setLevel(logging.INFO)
+LOGGER.propagate = False
+
+
 class MetaRouterClient:
     """Encapsulate interaction with the meta router prompt."""
 
     def __init__(self, llm_call: LLMCallable, *, prompt_name: str = "meta_router") -> None:
         self._llm_call = llm_call
         self._prompt_template = load_prompt(prompt_name)
-        self._logger = logging.getLogger(__name__)
+        self._logger = LOGGER
 
     def _prepare_payload(self, context: RoutingContext) -> Tuple[str, Dict]:
         user_payload: Dict = context.raw_payload or context.dict(exclude_none=True)
