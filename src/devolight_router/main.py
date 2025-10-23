@@ -35,11 +35,11 @@ app = FastAPI(title="DevoLight Router Demo")
 
 def build_router_service() -> RouterService:
     session_repository = SessionRepository()
-    orchestrator: ExecutionOrchestrator = build_default_orchestrator()
     try:
         llm_callable = ClaudeMessagesCallable.from_environment()
     except ClaudeMessagesError as exc:
         raise RuntimeError(f"无法初始化 Claude 客户端: {exc}") from exc
+    orchestrator: ExecutionOrchestrator = build_default_orchestrator(llm_callable)
     meta_client = MetaRouterClient(llm_callable)
     service = RouterService(
         meta_client=meta_client,
