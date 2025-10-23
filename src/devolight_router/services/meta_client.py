@@ -36,10 +36,11 @@ class MetaRouterClient:
         try:
             response = json.loads(raw)
         except json.JSONDecodeError as exc:
-            raise MetaRouterResponseError("MetaRouter 返回值不是合法 JSON。") from exc
+            preview = raw if len(raw) <= 500 else f"{raw[:500]}…"
+            message = f"MetaRouter 返回值不是合法 JSON。原始响应：{preview}"
+            raise MetaRouterResponseError(message) from exc
         try:
             decision = RoutingDecision.parse_obj(response)
         except ValidationError as exc:
             raise MetaRouterResponseError("MetaRouter 返回值未通过数据模型校验。") from exc
         return decision
-
