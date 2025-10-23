@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Dict, Optional
 
 from ..prompts import load_prompt
@@ -17,6 +18,17 @@ def _create_stub_executor(prefix: str) -> RoleExecutor:
     return executor
 
 
+LOGGER = logging.getLogger(__name__)
+if not LOGGER.handlers:
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    handler.setFormatter(formatter)
+    LOGGER.addHandler(handler)
+LOGGER.setLevel(logging.INFO)
+LOGGER.propagate = False
+
+
 class PromptRoleExecutor:
     """Invoke a prompt-driven role via LLM callable."""
 
@@ -26,7 +38,9 @@ class PromptRoleExecutor:
 
     def __call__(self, context: RoutingContext, role: SelectedRole) -> str:
         payload = self._build_payload(context, role)
-        return self._llm_call(self._prompt_template, payload)
+        LOGGER.info("Invoking role %s with payload keys: %s", role.name, ", ".join(payload.keys()))
+        raw = self._llm_call(self._prompt_template, payload)
+        return raw
 
     @staticmethod
     def _build_payload(context: RoutingContext, role: SelectedRole) -> Dict:

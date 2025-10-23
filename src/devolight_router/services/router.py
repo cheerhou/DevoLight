@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional
 
@@ -14,6 +15,16 @@ from ..models import (
 from .meta_client import MetaRouterClient, MetaRouterResponseError
 
 RoleExecutor = Callable[[RoutingContext, SelectedRole], str]
+
+LOGGER = logging.getLogger(__name__)
+if not LOGGER.handlers:
+    handler = logging.StreamHandler()
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    handler.setFormatter(formatter)
+    LOGGER.addHandler(handler)
+LOGGER.setLevel(logging.INFO)
+LOGGER.propagate = False
 
 
 @dataclass
@@ -61,10 +72,14 @@ class ExecutionOrchestrator:
 
     def run(self, context: RoutingContext, decision: RoutingDecision) -> List[RoleExecutionResult]:
         results: List[RoleExecutionResult] = []
+        role_names = [selected.name for selected in decision.selected_roles]
+        if role_names:
+            LOGGER.info("Executing roles in order: %s", " -> ".join(role_names))
         for selected in decision.selected_roles:
             executor = self._role_callers.get(selected.name)
             if executor is None:
                 raise KeyError(f"未注册角色执行器: {selected.name}")
+            LOGGER.info("Running role %s", selected.name)
             content = executor(context, selected)
             results.append(RoleExecutionResult(role_name=selected.name, content=content))
         return results
@@ -155,4 +170,3 @@ class SessionRepository:
 
     def save(self, state: SessionState) -> None:
         self._store[state.session_id] = state
-

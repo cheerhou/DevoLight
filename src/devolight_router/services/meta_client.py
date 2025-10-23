@@ -45,7 +45,7 @@ class MetaRouterClient:
 
     def route(self, context: RoutingContext) -> RoutingDecision:
         prompt, payload = self._prepare_payload(context)
-        self._logger.info("MetaRouter prompt: %s", prompt)
+        # self._logger.info("MetaRouter prompt: %s", prompt)
         try:
             serialized_payload = json.dumps(payload, ensure_ascii=False)
         except (TypeError, ValueError):
