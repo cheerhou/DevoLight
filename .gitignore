@@ -2,3 +2,5 @@ __pycache__/
 .pytest_cache/
 uvicorn.log
 *.pyc
+frontend/node_modules/
+frontend/dist/
