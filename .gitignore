@@ -1,6 +1,16 @@
+# Python artifacts
 __pycache__/
+*.py[cod]
 .pytest_cache/
+
+# Logs
 uvicorn.log
-*.pyc
+*.log
+
+# Frontend build
 frontend/node_modules/
 frontend/dist/
+frontend/.env
+
+# Misc
+.DS_Store
