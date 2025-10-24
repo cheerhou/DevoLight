@@ -28,4 +28,4 @@ fi
 PORT="${PORT:-8000}"
 
 echo "启动 DevoLight Router 服务: http://127.0.0.1:${PORT}"
-exec uvicorn src.devolight_router.main:app --host 127.0.0.1 --port "$PORT"
+exec uvicorn backend.devolight_router.main:app --host 127.0.0.1 --port "$PORT"

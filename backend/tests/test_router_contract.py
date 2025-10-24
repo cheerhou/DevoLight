@@ -2,10 +2,10 @@ import json
 
 import pytest
 
-from src.devolight_router.models import RoutingContext, RoutingMode
-from src.devolight_router.services.executor import build_default_orchestrator
-from src.devolight_router.services.meta_client import MetaRouterClient, MetaRouterResponseError
-from src.devolight_router.services.router import (
+from backend.devolight_router.models import RoutingContext, RoutingMode
+from backend.devolight_router.services.executor import build_default_orchestrator
+from backend.devolight_router.services.meta_client import MetaRouterClient, MetaRouterResponseError
+from backend.devolight_router.services.router import (
     ContextBuilder,
     FallbackManager,
     RouterService,
@@ -97,4 +97,3 @@ def test_router_service_runs_with_stub_meta_router():
         "MarthaMentor",
     ]
     assert not result.warnings
-
